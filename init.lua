@@ -21,7 +21,14 @@ require('packer').startup(function()
   use 'hrsh7th/cmp-nvim-lsp' -- LSP source for nvim-cmp
   use 'saadparwaiz1/cmp_luasnip' -- Snippets source for nvim-cmp
   use 'L3MON4D3/LuaSnip' -- Snippets plugin
-  use { "catppuccin/nvim", as = "catppuccin" }
+  use { 'catppuccin/nvim', as = 'catppuccin' }
+  use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
+  use 'nvim-lua/plenary.nvim'
+  use { -- Requires CMake and Build Tools on windows
+    'nvim-telescope/telescope-fzf-native.nvim',
+    run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'
+  }
+  use { 'nvim-telescope/telescope.nvim', tag = '0.1.1', requires = { {'nvim-lua/plenary.nvim'} } }
   if packer_bootstrap then
     require('packer').sync()
   end
@@ -99,3 +106,21 @@ if (is_win32 == 1) then
 	vim.opt.shellquote = ""
 	vim.opt.shellxquote = ""
 end
+
+-- Treesitter config
+require'nvim-treesitter'.setup {
+	ensure_installed = { 'lua', 'vim', 'rust' },
+	sync_install = false,
+	auto_install = true,
+	highlight = { enable = true }
+}
+
+-- Telescope mappings
+local builtin = require('telescope.builtin')
+vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
+vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
+vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
+vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
+
+-- Random conf stuff
+vim.o.number = true
